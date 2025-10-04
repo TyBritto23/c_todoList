@@ -20,14 +20,6 @@ void clear_input_buffer() {
 #define BANNER "===== TODO LIST ====="
 #define MAX_SIZE 1024
 
-/* What Todo
- * 3. Understand if user completed their task and write to file on that line
- * 4. Complete and incomplete variables giving trouble
- * 5. Finish implementing the change between complete and incomplete
- * 6. Add Delete option
-*/
-
-
 int main(){
     // Allows User to choose from the menu screen
     int option = 0;
