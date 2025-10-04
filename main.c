@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
 
 void printFileToScreen(int mark);
 void writeToFile();
 void menu();
 void doTask(int option);
 void markComplete(int option);
-void appendToFile(char *task, int line);
 void deleteLine(int line);
 
 //Clears buffer
@@ -31,10 +29,12 @@ void clear_input_buffer() {
 
 
 int main(){
+    // Allows User to choose from the menu screen
     int option = 0;
     while(option != 5){
         menu();
         printf("Choose Option: ");
+        //Makes sure input is a valid option
         if(scanf("%d", &option) == 1){
             doTask(option);
         }
@@ -43,45 +43,25 @@ int main(){
             break;
         }
     }
-
-    /* FILE *fp; */
-    /* char todo[256]; */
-
-    /* printf("Task: "); */
-
-    /* if (fgets(todo, sizeof(todo), stdin)==0) { */
-    /*     exit(1); */
-    /* } */
-
-    /* fp = fopen("todo.txt", "r"); */
-
-    /* // Checks if there is an error opening the FILE */
-    /* if (fp == NULL){ */
-    /*     printf("Error Opening File\n"); */
-    /*     exit(1); */
-    /* } */
-
-    /* writeToFile(todo); */
-
-    /* printFileToScreen(); */
-
-    /* fclose(fp); */
-
-    /* return 0; */
 }
 
+
+// Does the task that the user picked from the menu
 void doTask(int option){
     int mark = 0;
+    // Views task in todo.txt file
     if(option == 1){
         system("clear");
         printf("\n");
         printFileToScreen(0);
         printf("\n");
     }
+    // Add task to todo.txt file
     else if(option == 2){
         clear_input_buffer();
         writeToFile();
     }
+    // Marks task as complete
     else if(option == 3){
         printf("\n");
         clear_input_buffer();
@@ -94,6 +74,7 @@ void doTask(int option){
             printf("Not Valid Input\n");
         }
     }
+    // Deletes task from file
     else if(option == 4){
         printf("\n");
         clear_input_buffer();
@@ -110,13 +91,16 @@ void doTask(int option){
 }
 
 
+// Will print whats in the todo.txt file to screen
 void printFileToScreen(int mark){
     int count = 1;
     FILE *fp = fopen("todo.txt", "r");
     char firstChar;
     char todoList[MAX_SIZE];
     printf("%s\n", BANNER);
+    // Grabs each line in the file and prints it to the screen one by one
     while(fgets(todoList, MAX_SIZE, fp) != NULL){
+        // If We need to List the lines we add the line number before the line
         if(mark == 1)
             printf("%d. %s",count, todoList);
         else
@@ -126,17 +110,19 @@ void printFileToScreen(int mark){
 }
 
 
-/* void writeToFile(char *text){ */
+// Writes task to the file
 void writeToFile(){
     FILE *fp = fopen("todo.txt", "a");
-    char todo[256];
+    char todo[MAX_SIZE];
 
     printf("Task: ");
 
+    // If Something is wrong with the file exit the program
     if (fgets(todo, sizeof(todo), stdin)==0) {
         exit(1);
     }
 
+    //Automatically assume a new task is incomplete
     fprintf(fp, "%c %s",INCOMPLETE, todo);
     fclose(fp);
 }
@@ -153,6 +139,7 @@ void menu(){
 
 
 //Save current file into bufffer, change line in buffer, save buffer to file
+// User will choose task to mark as complete / incomplete
 void markComplete(int mark){
     int count = 1;
     FILE *fpIn = fopen("todo.txt", "r");
@@ -170,6 +157,7 @@ void markComplete(int mark){
     char* modifyLine = buffer[mark-1];
     int lineLength = strlen(modifyLine);
 
+    //Checks if task is already complete or incomplete
     if(modifyLine[0] == COMPLETE){
         modifyLine[0] = INCOMPLETE;
     }
@@ -177,6 +165,7 @@ void markComplete(int mark){
         modifyLine[0] = COMPLETE;
     }
 
+    // Write the updated task to the file
     FILE *fpOut = fopen("todo.txt", "w");
     for(int i = 0; i< currentLine; i++){
         fputs(buffer[i], fpOut);
@@ -186,7 +175,7 @@ void markComplete(int mark){
 
 }
 
-
+// Will delete the task of the users choice
 void deleteLine(int line){
     int count = 1;
     FILE *fpIn = fopen("todo.txt", "r");
@@ -195,10 +184,12 @@ void deleteLine(int line){
     char buffer[MAX_SIZE];
     int currentLine = 0;
 
+    // Create a temp file to hold updated todo list
     FILE *tempFile = fopen("temp.txt", "w");
 
     // Grabs max lines of the filew
     while(fgets(buffer, sizeof(buffer), fpIn) != NULL){
+        // If this is not the deleted line, add it to the temp file
         if(count != line){
             fputs(buffer, tempFile);
         }
@@ -207,8 +198,7 @@ void deleteLine(int line){
     fclose(fpIn);
     fclose(tempFile);
 
+    // Deletes old todo file and makes the temp file the new todo file
     remove("todo.txt");
     rename("temp.txt", "todo.txt");
-
-
 }
